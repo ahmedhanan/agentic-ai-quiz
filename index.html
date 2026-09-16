@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0b0f19">
+<title>Agentic AI — Quick Quiz</title>
+<style>
+  :root{
+    --bg:#0b0f19; --panel:#141a29; --panel-2:#1b2338; --line:#28324c;
+    --text:#eef2ff; --muted:#9aa6c6; --accent:#7c5cff; --accent-2:#59d0ff;
+    --good:#33d69f; --radius:16px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%}
+  body{
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(124,92,255,.20), transparent 60%),
+      radial-gradient(900px 500px at -10% 110%, rgba(89,208,255,.14), transparent 55%),
+      var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5;-webkit-font-smoothing:antialiased;
+    display:flex;flex-direction:column;align-items:center;
+    padding:max(20px,env(safe-area-inset-top)) 18px max(24px,env(safe-area-inset-bottom));
+    min-height:100dvh;
+  }
+  .app{width:100%;max-width:480px;margin:auto 0;display:flex;flex-direction:column;gap:18px}
+  .card{
+    background:linear-gradient(180deg,var(--panel),var(--panel-2));
+    border:1px solid var(--line);border-radius:var(--radius);
+    padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.35);
+  }
+  .eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent-2);font-weight:700;margin:0 0 8px}
+  h1{font-size:26px;line-height:1.2;margin:0 0 6px;font-weight:800;letter-spacing:-.01em}
+  .lede{color:var(--muted);margin:0 0 4px}
+  .hint{color:var(--muted);font-size:13.5px;margin:14px 0 0}
+  .steps{display:flex;gap:8px;margin:16px 0 2px}
+  .steps span{flex:1;text-align:center;font-size:12px;color:var(--muted);
+    border:1px dashed var(--line);border-radius:10px;padding:8px 4px}
+  .steps b{display:block;color:var(--text);font-size:13px}
+  button{font-family:inherit;cursor:pointer;border:none}
+  .btn{
+    width:100%;background:linear-gradient(180deg,var(--accent),#5a3ff0);color:#fff;
+    font-weight:700;font-size:17px;padding:16px;border-radius:14px;margin-top:18px;
+    box-shadow:0 10px 24px rgba(124,92,255,.35);transition:transform .06s ease,filter .2s;
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn.secondary{background:var(--panel-2);border:1px solid var(--line);box-shadow:none;color:var(--text)}
+  .topbar{display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:2px}
+  .pill{background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:5px 11px;font-weight:600}
+  .progress{height:8px;background:var(--panel-2);border:1px solid var(--line);border-radius:999px;overflow:hidden;margin:10px 0 20px}
+  .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0;transition:width .3s ease}
+  .q{font-size:20px;font-weight:700;margin:2px 0 18px;letter-spacing:-.01em}
+  .opts{display:flex;flex-direction:column;gap:11px}
+  .opt{
+    text-align:left;background:var(--panel-2);border:1px solid var(--line);color:var(--text);
+    border-radius:13px;padding:15px 16px;font-size:16px;display:flex;align-items:center;gap:13px;
+    transition:border-color .15s,background .15s,transform .06s;
+  }
+  .opt:active{transform:scale(.99)}
+  .opt .dot{flex:0 0 22px;height:22px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--muted)}
+  .opt.sel{border-color:var(--accent);background:rgba(124,92,255,.14)}
+  .opt.sel .dot{border-color:var(--accent);background:var(--accent);color:#fff}
+  .score{font-size:64px;font-weight:800;letter-spacing:-.02em;margin:6px 0 2px;
+    background:linear-gradient(90deg,var(--accent-2),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .msg{color:var(--muted);margin:0 0 6px}
+  .history{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
+  .history h3{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;font-weight:700}
+  .hrow{display:flex;align-items:center;justify-content:space-between;font-size:14px;padding:7px 0;border-bottom:1px dotted var(--line)}
+  .hrow:last-child{border-bottom:none}
+  .hrow span{color:var(--muted)}
+  .hrow b{font-variant-numeric:tabular-nums}
+  .foot{text-align:center;color:var(--muted);font-size:12px;opacity:.8}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+  <div class="app">
+    <!-- START -->
+    <section id="start" class="card">
+      <p class="eyebrow">Agentic AI · quick check</p>
+      <h1>How well do you know your agents?</h1>
+      <p class="lede">8 quick questions. No sign-up, nothing is saved or shared — you just get a score at the end.</p>
+      <div class="steps">
+        <span><b>Before</b>the talk</span>
+        <span><b>Midway</b>through</span>
+        <span><b>After</b>the end</span>
+      </div>
+      <p class="hint">You'll take it three times during the session. Each round pulls fresh questions, so watch your score move.</p>
+      <button class="btn" id="startBtn">Start round 1</button>
+    </section>
+
+    <!-- QUIZ -->
+    <section id="quiz" class="card hidden">
+      <div class="topbar">
+        <span class="pill" id="attemptTag">Round 1</span>
+        <span id="counter">1 / 8</span>
+      </div>
+      <div class="progress"><i id="bar"></i></div>
+      <div class="q" id="qText"></div>
+      <div class="opts" id="opts"></div>
+    </section>
+
+    <!-- RESULT -->
+    <section id="result" class="card hidden">
+      <p class="eyebrow" id="resTag">Round 1 · result</p>
+      <div class="score" id="scorePct">0%</div>
+      <p class="msg" id="resMsg"></p>
+      <div class="history hidden" id="history">
+        <h3>Your rounds so far</h3>
+        <div id="hrows"></div>
+      </div>
+      <button class="btn" id="againBtn">Take the next round</button>
+      <button class="btn secondary" id="resetBtn">Reset my rounds</button>
+    </section>
+
+    <p class="foot">Your answers stay on this device. Correct answers are never shown.</p>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+  const SALT = 'agentic-2026-∆loop∆';   // must match build_questions.mjs
+  const PER_ROUND = 8;
+  const KEY = 'agentic_quiz_scores_v1';
+
+  const POOL = /*POOL_JSON*/[{"q":"Which era gives the system a high-level GOAL plus guardrails — not rules and not a single prompt?","o":["Rules-based software","Generative AI","Agentic AI","Cloud computing"],"a":"14ccc3654d0c5193","c":1},{"q":"Rules-based software (the \"calculator\" era) is best described as…","o":["Flexible and tolerant of novel input","Predictable and auditable but rigid","Goal-driven and self-correcting","Passive until spoken to"],"a":"e717c0c3dbf57666","c":1},{"q":"What is the key LIMITATION of generative AI as described in the talk?","o":["It crashes on any unprogrammed input","It is passive — it only reacts when prompted, then stops","It cannot handle novel input","It needs guardrails and tool access"],"a":"de5a1b190f45941a","c":1},{"q":"How does generative AI actually work?","o":["It follows hand-authored IF/THEN branches","It predicts the most likely next word/pixel/sound from patterns","It loops: plan, act, observe, reflect","It looks answers up by key in a database"],"a":"0b99a6140cf11e53","c":1},{"q":"Scenario: an HR dropdown to request leave that a manager clicks \"Approve\". Where on the spectrum?","o":["Rules-based code (zero autonomy)","Passive generative AI","Agentic AI (full autonomy)","Long-term memory"],"a":"ed84d2cd5810fd8d","c":1},{"q":"Scenario: a chatbot answers \"What is our parental leave policy?\" with a paragraph from a PDF, then stops. This is…","o":["Rules-based code","Passive generative AI (basic retrieval)","Agentic AI","A tool call"],"a":"b538cbea0cba77e4","c":1},{"q":"Scenario: an assistant spots a calendar clash, proposes times to the client, updates the invite once confirmed, and leaves a note. This is…","o":["Rules-based code","Passive generative AI","Agentic AI","A validation rule"],"a":"14ccc3654d0c5193","c":1},{"q":"In the agentic era, where does most of the design effort shift to?","o":["Writing more IF/THEN branches","Guardrails, tool access and oversight","A larger training dataset","A faster user interface"],"a":"79d18492ab8c5cfb","c":1},{"q":"What is the correct order of the agent’s cybernetic loop?","o":["Act → Plan → Reflect → Observe","Plan → Act → Observe → Reflect","Observe → Plan → Act → Reflect","Plan → Observe → Act → Reflect"],"a":"b35eefdb59776c0c","c":2},{"q":"In the \"Observe\" step of the loop, the agent is doing what?","o":["Choosing its ultimate goal","Executing a single micro-step","Looking at the result of its action — did it work or error?","Deciding what to keep in long-term memory"],"a":"b46febc1884bf817","c":2},{"q":"What are the four moving parts in the anatomy of an agent?","o":["Core LLM, Planning, Memory, Tools","Rules, Prompts, Goals, Guardrails","Input, Output, Cache, Network","Plan, Act, Observe, Reflect"],"a":"6ff112e109e74813","c":2},{"q":"In an agent, the Core LLM is no longer the thing that produces the answer — it is the thing that…","o":["Stores the memory","Makes the decision","Sends the email","Writes the rules"],"a":"d11d2ecd9a8d00e0","c":2},{"q":"The talk says you evaluate an agent primarily on…","o":["The elegance of a single response","The quality of its decisions and its recovery from bad ones","How fast it types","The size of its context window"],"a":"4c9f5322c40e8f57","c":2},{"q":"What does the Planning framework (e.g. ReAct) actually give you?","o":["A cleverer model","A deliberate, human-readable, auditable trail of reasoning","Faster tool calls","A larger memory store"],"a":"3e378d2f1de66a1d","c":2},{"q":"In a ReAct trace, what always comes immediately before an Action?","o":["An Observation","A stated Thought (the reason)","A tool error","The final answer"],"a":"7b637b60b78dc16e","c":2},{"q":"The \"intern with a credit card\" who books the first flight they see illustrates what?","o":["A good long-term memory","Acting without a planning framework","A well-designed tool layer","The Observe step working correctly"],"a":"f4161f0f15d220cb","c":2},{"q":"Short-term memory (the \"scratchpad\" / context window) mainly exists to…","o":["Remember you across sessions weeks later","Stop the agent going round in circles within a session","Send real-world actions","Replace the Core LLM"],"a":"e3b57d0cd979fb6d","c":2},{"q":"Long-term memory (the \"filing cabinet\", often a vector database) is retrieved…","o":["By looking up an exact key","By relevance — what resembles the current situation","Only when the session ends","By the tool layer"],"a":"20a8b6d07ecf3d72","c":2},{"q":"A model can only ever emit text. What turns that text into a real-world change?","o":["The context window","The tool layer (the \"appendages\")","Long-term memory","The planning step"],"a":"f1feb575dc05bdc3","c":2},{"q":"In the tool flow, what does the runtime do when the model emits e.g. [TRIGGER_EMAIL: send to boss]?","o":["Shows the raw text to the user","Intercepts it as a command and stops it reaching the user","Stores it in long-term memory","Ignores it as prose"],"a":"56f2bd1c1275460d","c":2},{"q":"The talk’s honest answer to \"is it safe?\" is that you control…","o":["The model’s thoughts","Which tools the model is allowed to reach for","The size of the training data","The user’s prompt"],"a":"2d935834b05d3b9a","c":2},{"q":"Remove any ONE of the four components and the loop stops. Which pairing is right?","o":["No tools = no eyes","No memory = no learning","No planning = no hands","No LLM = no observation"],"a":"cc17924501e27793","c":2},{"q":"In the \"be the agent\" exercise, if something is NOT written on the board, then…","o":["The agent still remembers it","The agent does not know it","It becomes long-term memory","It triggers a tool"],"a":"bfaca8b66e23d9db","c":3},{"q":"The debrief calls this \"the single most common real-world agent failure\":","o":["Choosing the cheapest fare","Acting without observing — assuming success after an error","Writing too many thoughts","Using too many tools"],"a":"7f00a59b655e716a","c":3},{"q":"The talk’s closing point: a \"forgotten constraint\" or an \"unread error\" is fixed by…","o":["A cleverer / bigger model","Better memory, tighter guardrails and an honest observation step","More training data","Faster hardware"],"a":"468e5cc2e952b00e","c":3},{"q":"An \"infinite loop\" failure in the exercise happened because…","o":["The goal was too ambitious","The same tool was called twice and nobody read the board","The model was too small","There were too many tools"],"a":"2936d7026ddca1e2","c":3}]/*END_POOL*/;
+
+  const $ = (id) => document.getElementById(id);
+  const shuffle = (arr) => { const a = arr.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+
+  async function sha16(str){
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(SALT + '|' + str));
+    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,16);
+  }
+
+  const getScores = () => { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch(e){ return []; } };
+  const saveScore = (pct) => { const s = getScores(); s.push(pct); localStorage.setItem(KEY, JSON.stringify(s)); return s; };
+
+  let round = 1, questions = [], idx = 0, correct = 0, locked = false;
+
+  function startRound(){
+    round = getScores().length + 1;
+    questions = shuffle(POOL).slice(0, Math.min(PER_ROUND, POOL.length))
+                  .map(q => ({ ...q, o: shuffle(q.o) }));
+    idx = 0; correct = 0; locked = false;
+    $('attemptTag').textContent = 'Round ' + round;
+    show('quiz'); renderQuestion();
+  }
+
+  function renderQuestion(){
+    locked = false;
+    const q = questions[idx];
+    $('counter').textContent = (idx+1) + ' / ' + questions.length;
+    $('bar').style.width = ((idx)/questions.length*100) + '%';
+    $('qText').textContent = q.q;
+    const opts = $('opts'); opts.innerHTML = '';
+    q.o.forEach((text, i) => {
+      const b = document.createElement('button');
+      b.className = 'opt';
+      b.innerHTML = '<span class="dot">'+String.fromCharCode(65+i)+'</span><span>'+escapeHtml(text)+'</span>';
+      b.addEventListener('click', () => choose(b, q, text));
+      opts.appendChild(b);
+    });
+  }
+
+  async function choose(btn, q, text){
+    if(locked) return; locked = true;
+    document.querySelectorAll('.opt').forEach(o => o.classList.remove('sel'));
+    btn.classList.add('sel');
+    const picked = await sha16(text);
+    if(picked === q.a) correct++;
+    setTimeout(next, 220);   // brief highlight of the *chosen* option only — no right/wrong shown
+  }
+
+  function next(){
+    idx++;
+    if(idx < questions.length){ renderQuestion(); }
+    else finish();
+  }
+
+  function finish(){
+    $('bar').style.width = '100%';
+    const pct = Math.round(correct / questions.length * 100);
+    const scores = saveScore(pct);
+    $('scorePct').textContent = pct + '%';
+    $('resTag').textContent = 'Round ' + scores.length + ' · result';
+    $('resMsg').textContent = messageFor(pct);
+    renderHistory(scores);
+    $('againBtn').textContent = 'Take round ' + (scores.length + 1);
+    show('result');
+  }
+
+  function messageFor(pct){
+    if(pct >= 85) return "Sharp — you've got the agent loop down.";
+    if(pct >= 60) return "Solid. A few pieces still settling into place.";
+    if(pct >= 35) return "Getting there — the next part of the talk will help.";
+    return "All good — this is exactly why we're here. Keep watching.";
+  }
+
+  function renderHistory(scores){
+    if(scores.length < 2){ $('history').classList.add('hidden'); return; }
+    $('history').classList.remove('hidden');
+    const labels = ['Before','Midway','After','Round 4','Round 5','Round 6'];
+    $('hrows').innerHTML = scores.map((s,i) =>
+      '<div class="hrow"><span>'+(labels[i]||('Round '+(i+1)))+'</span><b>'+s+'%</b></div>').join('');
+  }
+
+  function escapeHtml(s){ return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function show(which){ ['start','quiz','result'].forEach(id => $(id).classList.toggle('hidden', id !== which)); window.scrollTo(0,0); }
+
+  $('startBtn').addEventListener('click', startRound);
+  $('againBtn').addEventListener('click', startRound);
+  $('resetBtn').addEventListener('click', () => { localStorage.removeItem(KEY); show('start'); $('startBtn').textContent = 'Start round 1'; });
+
+  // Reflect any prior rounds in the start button label
+  (function initLabels(){
+    const n = getScores().length;
+    if(n > 0) $('startBtn').textContent = 'Start round ' + (n + 1);
+  })();
+})();
+</script>
+</body>
+</html>
